@@ -1,115 +1,120 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# BookStore E-Commerce: Database Relasional
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+| | |
+|---|---|
+| **Nama** | Muhammad Satria Prayoga |
+| **NIM** | 24090108 |
+| **Mata Kuliah** | Framework Programming |
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Perancangan database relasional untuk aplikasi toko buku online (BookStore)
+yang memenuhi prinsip normalisasi, menjaga integritas data, dan
+diimplementasikan menggunakan NestJS dan TypeORM.
 
-## Description
+## Teknologi
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- NestJS
+- TypeORM
+- PostgreSQL 16 (Docker)
+- DBeaver (untuk melihat database dan ERD)
 
-## Project setup
+## Cara Menjalankan
 
-```bash
-$ npm install
-```
+1. Clone repository dan install dependency:
+   ```bash
+   git clone <url-repository>
+   cd <nama-folder-project>
+   npm install
+   ```
+2. Buat file `.env` di root project:
+   ```env
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_USERNAME=root
+   DB_PASSWORD=secret
+   DB_DATABASE=bookstore
+   ```
+3. Jalankan PostgreSQL dengan Docker (pastikan Docker Desktop sudah berjalan):
+   ```bash
+   docker compose up -d
+   ```
+   Isi `docker-compose.yml`:
+   ```yaml
+   services:
+     postgres-db:
+       image: postgres:16-alpine
+       container_name: harkat_postgres
+       restart: always
+       environment:
+         POSTGRES_USER: root
+         POSTGRES_PASSWORD: secret
+         POSTGRES_DB: bookstore
+       ports:
+         - "5432:5432"
+       volumes:
+         - postgres_data_volume:/var/lib/postgresql/data
 
-## Compile and run the project
+   volumes:
+     postgres_data_volume:
+   ```
+4. Jalankan aplikasi:
+   ```bash
+   npm run start:dev
+   ```
+   Tabel dibuat otomatis oleh TypeORM.
+5. Buka database di DBeaver (host `localhost`, port `5432`, database
+   `bookstore`, user `root`, password `secret`), lalu cek 11 tabel di
+   `bookstore` → `Schemas` → `public` → `Tables`.
 
-```bash
-# development
-$ npm run start
+## Daftar Tabel
 
-# watch mode
-$ npm run start:dev
+| No | Tabel | Fungsi |
+|---|---|---|
+| 1 | `customers` | Menyimpan data pelanggan |
+| 2 | `customer_addresses` | Menyimpan alamat pelanggan |
+| 3 | `categories` | Menyimpan kategori buku |
+| 4 | `publishers` | Menyimpan data penerbit |
+| 5 | `books` | Menyimpan informasi buku |
+| 6 | `authors` | Menyimpan data penulis |
+| 7 | `book_authors` | Menghubungkan buku dan penulis |
+| 8 | `orders` | Menyimpan transaksi pesanan |
+| 9 | `order_items` | Menyimpan detail buku dalam pesanan |
+| 10 | `payments` | Menyimpan informasi pembayaran |
+| 11 | `shipments` | Menyimpan informasi pengiriman |
 
-# production mode
-$ npm run start:prod
-```
+## ERD
 
-## Run tests
+ERD di bawah ini dihasilkan dari DBeaver (database `bookstore`, schema `public`).
 
-```bash
-# unit tests
-$ npm run test
+![ERD BookStore](docs/erd.png)
 
-# e2e tests
-$ npm run test:e2e
+## Ringkasan Relasi
 
-# test coverage
-$ npm run test:cov
-```
+| Parent | Child | Relasi |
+|---|---|---|
+| customers | customer_addresses | One-to-Many |
+| customers | orders | One-to-Many |
+| categories | books | One-to-Many |
+| publishers | books | One-to-Many |
+| books | authors | Many-to-Many (lewat `book_authors`) |
+| orders | order_items | One-to-Many |
+| books | order_items | One-to-Many |
+| orders | payments | One-to-One |
+| orders | shipments | One-to-One |
 
-## Deployment
+## Penjelasan Desain
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
-"# framework" 
+- **Penulis dipisah ke tabel sendiri.** Tabel `books` tidak menyimpan nama
+  penulis. Relasi buku dan penulis dikelola lewat `authors` dan `book_authors`
+  (many-to-many) agar tidak ada redundansi dan satu buku bisa punya banyak
+  penulis.
+- **Kategori dan penerbit** dihubungkan lewat `category_id` dan `publisher_id`
+  di tabel `books` (one-to-many).
+- **Harga disimpan di `order_items`.** Kolom `price` pada `order_items` adalah
+  snapshot harga saat transaksi, sehingga riwayat pesanan tidak berubah
+  ketika harga buku di `books` diubah.
+- **Alamat pengiriman disimpan di `orders`.** Kolom `shipping_*` menyimpan
+  alamat saat checkout, sehingga perubahan alamat pelanggan tidak mengubah
+  pesanan lama.
+- **Pembayaran dan pengiriman** dipisah ke tabel `payments` dan `shipments`
+  yang masing-masing terhubung ke `orders` lewat `order_id`.
+- **Soft delete** memakai kolom `deleted_at` pada `customers` dan `books`.
