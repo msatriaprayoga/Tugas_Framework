@@ -85,7 +85,7 @@ diimplementasikan menggunakan NestJS dan TypeORM.
 
 ERD di bawah ini dihasilkan dari DBeaver (database `bookstore`, schema `public`).
 
-![ERD BookStore](docs/erd.png)
+![ERD BookStore](erd.png.png)
 
 ## Ringkasan Relasi
 
